@@ -2,109 +2,114 @@
  * @author Yatanvesh Bhardwaj <yatan.vesh@gmail.com>
  */
 import React, {Component} from 'react';
-import {View, TouchableOpacity, StyleSheet, FlatList, Image, StatusBar} from 'react-native'
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  StatusBar,
+  ActivityIndicator,
+  LayoutAnimation,
+} from 'react-native'
 import {connect} from "react-redux";
 
 import TrainerThumb from '../../components/Trainer/TrainerThumb';
-import colors, {appTheme} from "../../constants/colors";
+import {appTheme, darkPallet} from "../../constants/colors";
 import RouteNames from "../../navigation/RouteNames";
 import * as actionCreators from '../../store/actions';
-import {userTypes} from "../../constants/appConstants";
+import {defaultDP, INITIAL_PAGE, userTypes} from "../../constants/appConstants";
 import UserThumb from "../../components/Trainer/UserThumb";
 import {spacing} from "../../constants/dimension";
-import requestCameraAndAudioPermission from "../../utils/permission";
-import {initialiseVideoCall} from "../../utils/utils";
-// import {rootURL} from "../../constants/appConstants";
-// import {initialiseSocket} from "../../utils/utils";
-
-const defaultDP = 'https://media.istockphoto.com/photos/middle-aged-gym-coach-picture-id475467038';
+import {generateTrainerHits, generateUserHits} from "../../utils/utils";
+import fontSizes from "../../constants/fontSizes";
+import fonts from "../../constants/fonts";
 
 class UserListing extends Component {
-  async componentDidMount() {
-    const {updateTrainers, authToken} = this.props;
-    updateTrainers();
-    // global.socket = await initialiseSocket(authToken);
-    // console.log(global.socket)
+
+  state = {
+    nextPage: INITIAL_PAGE
   }
 
-  openTrainer = (trainerId) => {
+  componentDidMount() {
+    this.updateUsers();
+  }
+
+  updateUsers = async () => {
+    const {updateUsersList} = this.props;
+    const {nextPage} = this.state;
+    if (!!nextPage)
+      this.setState({nextPage: await updateUsersList(nextPage)});
+  }
+  openProfile = (userId) => {
     const {navigation} = this.props;
     navigation.navigate(RouteNames.Profile, {
-      userId: trainerId
+      userId: userId,
     });
   }
-
-  callClicked = async (userId) => {
-    const permissionGranted = await requestCameraAndAudioPermission();
-
-    if (permissionGranted) {
-      await initialiseVideoCall(userId);
-    } else console.log("Cant initiate video call without permission");
+  openPackage = (userId, packageId) => {
+    const {navigation} = this.props;
+    navigation.navigate(RouteNames.PackagesView, {
+      userId,
+      packageId
+    });
+  }
+  getPostCount = userId => {
+    const { postsForUser} = this.props;
+    if (postsForUser[userId])
+      return postsForUser[userId].length;
+    return 0;
   }
 
   renderUserThumb = (user, index) => {
-    const {userType} = user;
-    let {name, totalSlots = 0, usedSlots = 0, experience = 0, rating, displayPictureUrl} = user;
+    let {name, userType, experience = 0, rating, displayPictureUrl, packages, city, slots} = user;
     if (!displayPictureUrl) displayPictureUrl = defaultDP;
-
-    return (<View
-        activeOpacity={0.7}
-        style={styles.userContainer}
-        // onPress={() => this.openTrainer(user._id)}
-      >
-        {
-          userType === userTypes.USER && (
-            <UserThumb
-              name={name || 'User'}
-              dpUrl={displayPictureUrl}
-              location={'Bangalore'}
-              plan={Math.random() > 0.5 ? 'Basic' : 'Advanced'}
-              description={"No description provided for this user"}
-              onPress={()=>this.openTrainer(user._id)}
-              callClicked={()=>this.callClicked(user._id)}
-            />
-          )
-        }
-        {
-          userType === userTypes.TRAINER && (
-            <TrainerThumb
-              name={name || 'Trainer'}
-              slots={{
-                remaining: totalSlots - usedSlots,
-                used: usedSlots
-              }}
-              location={'Bangalore'}
-              dpUrl={displayPictureUrl}
-              experience={experience}
-              description={"No description provided for this trainer"}
-              rating={rating}
-              packages={packages} //niche hai file ke
-              onPress={()=>this.openTrainer(user._id)}
-              callClicked={()=>this.callClicked(user._id)}
-
-            />
-          )
-        }
+    const postCount = this.getPostCount(user._id);
+    return (
+      <View style={styles.userContainer}>
+        <TrainerThumb
+          name={name || 'Trainer'}
+          location={city}
+          hits={generateTrainerHits({transformation: experience, slot: slots.length, program: packages.length, post:postCount})}
+          dpUrl={displayPictureUrl}
+          rating={rating}
+          packages={packages}
+          onPress={() => this.openProfile(user._id)}
+          onPackagePress={(packageId) => this.openPackage(user._id, packageId)}
+        />
       </View>
     )
+  }
+
+  shouldComponentUpdate(nextProps, nextState, nextContext) {
+    if (nextProps.userList.length !== this.props.userList.length)
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    return true;
   }
 
   renderHorizontalSeparatorView = () => <View style={styles.itemSeparatorHorizontal}/>
 
   render() {
-    let users = this.props.trainers;
-
+    const {userList} = this.props;
     return (<>
-        <StatusBar backgroundColor={appTheme.background}/>
-        <View style={styles.listContainer}>
+        <StatusBar backgroundColor={appTheme.lightBackground}/>
+        <View
+          style={styles.listContainer}>
           <FlatList
             showsVerticalScrollIndicator={false}
             style={styles.container}
-            data={users}
+            data={userList}
             renderItem={({item, index}) => this.renderUserThumb(item, index)}
             keyExtractor={(item, index) => item._id}
             ItemSeparatorComponent={this.renderHorizontalSeparatorView}
+            ListHeaderComponent={() => <View style={{height: spacing.large}}/>}
+            ListFooterComponent={() => <View style={{height: spacing.large_lg}}/>}
+            onEndReached={this.updateUsers}
+            onEndReachedThreshold={0.5}
           />
+          {
+            userList.length === 0 && (
+              <ActivityIndicator style={{position: 'absolute'}} color={appTheme.brightContent} size={50}/>
+            )
+          }
         </View>
       </>
     );
@@ -113,32 +118,37 @@ class UserListing extends Component {
 
 const styles = StyleSheet.create({
   container: {
-
     width: '100%',
-    paddingLeft: spacing.large_lg,
-    paddingRight: spacing.large_lg,
-    paddingTop: spacing.large_lg,
+    paddingLeft: spacing.medium,
+    paddingRight: spacing.medium,
+    paddingBottom: spacing.medium,
+    // backgroundColor: appTheme.background,
   },
-
-
+  titleContainer: {
+    paddingTop: spacing.medium_sm,
+    paddingLeft: spacing.large,
+    paddingRight: spacing.large,
+    paddingBottom: spacing.medium_sm,
+    backgroundColor: appTheme.darkBackground,
+    alignItems: 'center',
+  },
+  title: {
+    color: 'white',
+    fontSize: fontSizes.h0,
+    fontFamily: fonts.PoppinsRegular
+  },
   listContainer: {
-    // flex: 1,
+    flex: 1,
     justifyContent: 'center',
     alignItems: "center",
-    backgroundColor: appTheme.darkBackground,
+    backgroundColor: appTheme.background,
     width: '100%',
-    // borderRadius: 20,
-    // borderColor: 'transparent',
-    // borderBottomLeftRadius: 0,
-    // borderBottomRightRadius: 0,
-    // marginTop: spacing.large_lg,
-    // paddingLeft: spacing.large,
-    // paddingRight: spacing.large
+    // paddingTop: spacing.large,
   },
   itemSeparatorHorizontal: {
     height: 1,
-    marginTop: spacing.medium,
-    marginBottom: spacing.medium,
+    marginTop: spacing.medium_lg,
+    marginBottom: spacing.medium_lg,
     backgroundColor: appTheme.grey,
   },
   userContainer: {
@@ -147,45 +157,12 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => ({
-  trainers: state.app.trainers,
-  authToken: state.user.authToken,
+  userList: state.app.userList,
+  postsForUser: state.social.postsForUser
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  updateTrainers: () => dispatch(actionCreators.updateTrainers()),
+  updateUsersList: (nextPage) => dispatch(actionCreators.updateUsersList(nextPage)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserListing);
-
-const packages = [
-  {
-    name: 'Weight Loss Program',
-    duration: 4,
-    price: 3500
-  },
-  {
-    name: 'Fat Gain Program',
-    duration: 4,
-    price: 3500
-  },
-  {
-    name: 'Weight Loss Program',
-    duration: 4,
-    price: 3500
-  },
-  {
-    name: 'Fat Gain Program',
-    duration: 4,
-    price: 3500
-  },
-  {
-    name: 'Weight Loss Program',
-    duration: 4,
-    price: 3500
-  },
-  {
-    name: 'Fat Gain Program',
-    duration: 4,
-    price: 3500
-  },
-]

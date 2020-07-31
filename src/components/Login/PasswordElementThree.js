@@ -16,7 +16,6 @@ const PasswordElementThree = (props) => {
             setIsPasswordHidden(false)
         else
             setIsPasswordHidden(true)
-        console.log(JSON.stringify(isPasswordHidden))
     }
 
     return (
@@ -24,7 +23,9 @@ const PasswordElementThree = (props) => {
             <View style={styles.container}>
                 <TextInput
                     placeholder={props.placeholder}
-                    placeholderTextColor="grey"
+                    // placeholderTextColor="grey"
+                    // placeholderTextColor="white"
+                    placeholderTextColor="#D1D8EB"
                     style={styles.password}
                     autoCapitalize="none"
                     secureTextEntry={isPasswordHidden}
@@ -58,9 +59,12 @@ const styles = StyleSheet.create(
             fontSize: 28,
             borderWidth: 1,
             borderRadius: 25,
-            backgroundColor: "rgba(52, 52, 52, 0.3)",
+            // backgroundColor: "rgba(52, 52, 52, 0.3)",
+            backgroundColor: "rgba(52, 52, 52, 0.5)",
             borderColor: 'grey',
             marginRight: 10,
+            paddingLeft:15,
+            paddingRight:15
 
         },
         icon: {

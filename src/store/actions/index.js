@@ -1,22 +1,68 @@
 export {
   setAuthenticated,
   resetAuth,
-  syncFirebaseAuth
+  syncFirebaseAuth,
+  setNewUser
 } from "./auth.actions";
 
 export {
   setAuthToken,
-  resetUser,
   setUserType,
   setInitialLoginOff,
+  updateUserData,
+  subscribePackage,
+  getActivities
+} from "./user.actions";
+
+export {
   setIncomingCall,
   endCallAction as endCall,
   setCallActive,
   resetInAppCall
-} from "./user.actions";
+} from './call.actions';
 
 export {
-  setTrainers,
-  updateTrainers,
-  setUser
+  setUserList,
+  updateUsersList,
+  setUser,
+  updateGlobalSlots
 } from "./app.actions";
+
+export {
+  createPackage,
+  deletePackage,
+  createSlots,
+  syncSubscriptions,
+  generateCoupons,
+  syncCoupons,
+  getAccountSummary,
+  addAccount,
+  getMyAccounts,
+  getCallbacks,
+  acceptCallback,
+  callbackDone,
+  rejectCallback,
+} from './trainer.actions';
+
+export {
+  updatePosts,
+  updatePost,
+  unlikePost,
+  likePost,
+  commentOnPost,
+  reportPost,
+  getPostsForUser,
+  updateQuestions,
+  answerQuestion,
+  deletePost,
+  reportQuestion
+} from './social.actions';
+
+export {
+  updateBmiRecords,
+  submitBmi,
+  getPreferences,
+  updatePreferences,
+  updateExerciseIndex,
+  updateTarget
+} from './fitness.actions';

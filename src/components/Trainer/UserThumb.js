@@ -7,18 +7,21 @@ import PropTypes from 'prop-types';
 
 import Avatar from '../Avatar';
 import GenericText from "../GenericText";
-import CallButton from '../callButton';
+import CallButton from '../CallButton';
 import {spacing} from "../../constants/dimension";
 import fontSizes from "../../constants/fontSizes";
 import fonts from "../../constants/fonts";
 import {toTitleCase} from "../../utils/utils";
 import {appTheme} from "../../constants/colors";
 import ExpandingText from "../ExpandingText";
+import Hits from "../Hits";
+import HitsList from "../HitsList";
+import strings from "../../constants/strings";
 
 const userThumb = (props) => {
   return (
     <TouchableOpacity onPress={props.onPress}>
-      <View style={styles.container}>
+      <View style={styles.titleContent}>
         <View style={styles.dpContainer}>
           <Avatar roundedMultiplier={4} size={spacing.thumbnailMini} url={props.dpUrl}/>
         </View>
@@ -26,21 +29,14 @@ const userThumb = (props) => {
           <Text style={styles.displayName}>{toTitleCase(props.name)}</Text>
           <Text style={styles.location}>{toTitleCase(props.location)}</Text>
         </View>
-        <View style={styles.callButtonContainer}>
-          <CallButton onPress={props.callClicked} />
-        </View>
+
       </View>
 
       <View style={styles.extraContent}>
-        {/*<View style={{width:spacing.thumbnailMini, alignContent:'center'}}>*/}
-
         <Text style={styles.plan}>{props.plan}</Text>
-        <View style={styles.bioContainer}>
-          <ExpandingText
-            style={{color: 'white'}}>
-            {props.description}</ExpandingText>
+        <View style={styles.hitsContainer}>
+          <HitsList hits={props.hits} size={fontSizes.h3}/>
         </View>
-
       </View>
     </TouchableOpacity>
   );
@@ -49,11 +45,11 @@ const userThumb = (props) => {
 userThumb.propTypes = {
   name: PropTypes.string.isRequired,
   dpUrl: PropTypes.string.isRequired,
-  location: PropTypes.string.isRequired
+  location: PropTypes.string.isRequired,
 };
 
 const styles = StyleSheet.create({
-  container: {
+  titleContent: {
     flex: 1,
     width: '100%',
     alignItems: 'center',
@@ -71,19 +67,18 @@ const styles = StyleSheet.create({
     fontFamily: fonts.PoppinsMedium
   },
   dpContainer: {
-    marginBottom: spacing.small
+    // marginBottom: spacing.small
   },
   textContainer: {
     paddingTop: spacing.small,
-    paddingBottom: spacing.small,
+    // paddingBottom: spacing.small,
+    marginLeft: spacing.medium_lg,
+    marginRight: 'auto'
+  },
+  hitsContainer: {
     marginLeft: spacing.medium_lg,
   },
-  callButtonContainer: {
-    marginLeft: 'auto'
-  },
   extraContent: {
-    flex: 1,
-    width: '100%',
     alignItems: 'center',
     flexDirection: 'row',
   },
@@ -94,13 +89,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 0.5,
     borderColor: appTheme.brightContent,
-    width: spacing.thumbnailMini ,
+    width: spacing.thumbnailMini,
     textAlign: 'center'
   },
-  bioContainer:{
-    marginLeft:spacing.medium_lg,
-    width:'60%'
-  }
 });
 
-export default userThumb;
+export default React.memo(userThumb);

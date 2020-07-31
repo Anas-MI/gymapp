@@ -12,7 +12,7 @@ import RNExitApp from "react-native-exit-app";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const PushNotification = require("react-native-push-notification");
-import requestCameraAndAudioPermission from "../../utils/permission";
+import {requestCameraAndAudioPermission} from "../../utils/permission";
 import RouteNames from "../../navigation/RouteNames";
 
 import CallBackground from '../../../assets/images/callBackground.png';
@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => ({
-  callData: state.user.callData,
-  inAppCall: state.user.inAppCall
+  callData: state.call.callData,
+  inAppCall: state.call.inAppCall
 });
 
 const mapDispatchToProps = (dispatch) => ({
