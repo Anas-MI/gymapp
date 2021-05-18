@@ -48,7 +48,7 @@
     "react-native-datepicker": "^1.7.2",
     "react-native-elements": "^2.0.2",
     "react-native-exit-app": "^1.1.0",
-    "react-native-fast-image": "^8.1.5",
+    "react-native-fast-image": "^8.3.0",
     "react-native-flash-message": "^0.1.15",
     "react-native-full-screen": "https://github.com/Yatanvesh/react-native-full-screen",
     "react-native-gesture-handler": "^1.6.1",
