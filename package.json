@@ -34,7 +34,7 @@
     "native-base": "^2.13.12",
     "prop-types": "^15.7.2",
     "react": "16.11.0",
-    "react-native": "0.62.2",
+    "react-native": "0.62.3",
     "react-native-24h-timepicker": "^1.1.0",
     "react-native-agora": "^3.0.1-beta.8",
     "react-native-android-pip": "https://github.com/Yatanvesh/rn-android-pip",
