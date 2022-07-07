@@ -30,7 +30,7 @@
     "axios": "^0.19.2",
     "cuid": "^2.1.8",
     "javascript-time-ago": "^2.0.8",
-    "moment": "^2.27.0",
+    "moment": "^2.29.4",
     "native-base": "^2.13.12",
     "prop-types": "^15.7.2",
     "react": "16.11.0",
